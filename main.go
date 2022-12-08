@@ -35,8 +35,8 @@ func createBook(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, newBook)
 }
 
-func bookByID(c *gin.Context){
-	id := c.Param("id")
+func bookByID(c *gin.Context) {
+	id := c.Param("id") // path parameter
 	book, err := getBookByID(id)
 
 	if err != nil {
@@ -44,6 +44,24 @@ func bookByID(c *gin.Context){
 		return
 	}
 
+	c.IndentedJSON(http.StatusOK, book)
+}
+
+func checkOutBook(c *gin.Context) {
+	id, ok := c.GetQuery("id") // query parameter
+
+	if !ok {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Misising id query parameter."})
+	}
+	book, err := getBookByID(id)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Book not found."})
+	}
+	if book.Quantity <= 0 {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"messgae": "Book not available."})
+	}
+	book.Quantity -= 1
 	c.IndentedJSON(http.StatusOK, book)
 }
 
@@ -62,5 +80,6 @@ func main() {
 	router.GET("/books", getBooks)
 	router.GET("/books/:id", bookByID)
 	router.POST("/books", createBook)
+	router.PATCH("/checkout", checkOutBook)
 	router.Run("localhost:8080")
 }

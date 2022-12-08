@@ -8,3 +8,6 @@
 
 ### FETCH
 ### => curl localhost:8080/books/2
+
+#### Checkout
+#### => curl "localhost:8080/checkout?id=2" --request "PATCH"   // need quotation marks to escape the question mark
